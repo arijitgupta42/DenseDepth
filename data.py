@@ -101,8 +101,8 @@ class NYU_BasicRGBSequence(Sequence):
 
             sample = self.dataset[index]
 
-            x = np.clip(np.asarray(Image.open( BytesIO(self.data[sample[0]]))).reshape(480,640,3)/255,0,1)
-            y = np.asarray(Image.open(BytesIO(self.data[sample[1]])), dtype=np.float32).reshape(480,640,1).copy().astype(float) / 10.0
+            x = np.clip(np.asarray(Image.open( BytesIO(self.data[sample[0].split('\r')[0]]))).reshape(480,640,3)/255,0,1)
+            y = np.asarray(Image.open(BytesIO(self.data[sample[1].split('\r')[0]])), dtype=np.float32).reshape(480,640,1).copy().astype(float) / 10.0
             y = DepthNorm(y, maxDepth=self.maxDepth)
 
             batch_x[i] = nyu_resize(x, 480)
