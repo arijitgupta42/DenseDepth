@@ -66,8 +66,8 @@ class NYU_BasicAugmentRGBSequence(Sequence):
 
             sample = self.dataset[index]
 
-            x = np.clip(np.asarray(Image.open( BytesIO(self.data[sample[1].split('\r')[0]]))).reshape(480,640,3)/255,0,1)
-            y = np.clip(np.asarray(Image.open( BytesIO(self.data[sample[2].split('\r')[0]]) )).reshape(480,640,1)/255*self.maxDepth,0,self.maxDepth)
+            x = np.clip(np.asarray(Image.open( BytesIO(self.data[sample[0].split('\r')[0]]))).reshape(480,640,3)/255,0,1)
+            y = np.clip(np.asarray(Image.open( BytesIO(self.data[sample[1].split('\r')[0]]) )).reshape(480,640,1)/255*self.maxDepth,0,self.maxDepth)
             y = DepthNorm(y, maxDepth=self.maxDepth)
 
             batch_x[i] = nyu_resize(x, 480)
