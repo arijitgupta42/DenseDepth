@@ -17,8 +17,8 @@ def nyu_resize(img, resolution=480, padding=6):
 def get_nyu_data(batch_size, nyu_data_zipfile='nyu_data.zip'):
     data = extract_zip(nyu_data_zipfile)
 
-    nyu2_train = list((row.split(',') for row in (data['data/nyu2_train.csv']).decode("utf-8").split('\n') if len(row) > 0))
-    nyu2_test = list((row.split(',') for row in (data['data/nyu2_test.csv']).decode("utf-8").split('\n') if len(row) > 0))
+    nyu2_train = list((row.split(',') for row in (data['kitti_raw/kitti_train.csv']).decode("utf-8").split('\n') if len(row) > 0))
+    nyu2_test = list((row.split(',') for row in (data['kitti_raw/kitti_test.csv']).decode("utf-8").split('\n') if len(row) > 0))
 
     shape_rgb = (batch_size, 480, 640, 3)
     shape_depth = (batch_size, 240, 320, 1)
@@ -66,8 +66,8 @@ class NYU_BasicAugmentRGBSequence(Sequence):
 
             sample = self.dataset[index]
 
-            x = np.clip(np.asarray(Image.open( BytesIO(self.data[sample[0]]) )).reshape(480,640,3)/255,0,1)
-            y = np.clip(np.asarray(Image.open( BytesIO(self.data[sample[1]]) )).reshape(480,640,1)/255*self.maxDepth,0,self.maxDepth)
+            x = np.clip(np.asarray(Image.open( BytesIO(self.data[sample[1].split('\r')[0]]))).reshape(480,640,3)/255,0,1)
+            y = np.clip(np.asarray(Image.open( BytesIO(self.data[sample[2].split('\r')[0]]) )).reshape(480,640,1)/255*self.maxDepth,0,self.maxDepth)
             y = DepthNorm(y, maxDepth=self.maxDepth)
 
             batch_x[i] = nyu_resize(x, 480)
