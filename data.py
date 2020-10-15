@@ -89,7 +89,7 @@ class NYU_BasicRGBSequence(Sequence):
         self.N = len(self.dataset)
         self.shape_rgb = shape_rgb
         self.shape_depth = shape_depth
-        self.maxDepth = 1000.0
+        self.maxDepth = 80.0
 
     def __len__(self):
         return int(np.ceil(self.N / float(self.batch_size)))
