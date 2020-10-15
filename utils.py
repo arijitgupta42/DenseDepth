@@ -2,7 +2,8 @@ import numpy as np
 from PIL import Image
 
 def DepthNorm(x, maxDepth):
-    return (x)
+    
+    return x
 
 def predict(model, images, minDepth=1, maxDepth=80, batch_size=2):
     # Support multiple RGBs, one RGB image, even grayscale 
