@@ -117,10 +117,27 @@ class VisionTransformer(tf.keras.Model):
         ]
         self.mlp_head = tf.keras.Sequential(
             [
-                LayerNormalization(epsilon=1e-6),
-                Dense(mlp_dim, activation=tfa.activations.gelu),
-                Dropout(dropout),
-                Dense(num_classes),
+                UpSampling2D((2, 2), interpolation='bilinear'), 
+                Conv2D(filters=self.d_model/2, kernel_size=3, strides=1, padding='same', name='1_convA'),
+                LeakyReLU(alpha=0.2),
+                Conv2D(filters=self.d_model/2, kernel_size=3, strides=1, padding='same', name='1_convB'),
+                LeakyReLU(alpha=0.2),
+                UpSampling2D((2, 2), interpolation='bilinear'), 
+                Conv2D(filters=self.d_model/4, kernel_size=3, strides=1, padding='same', name='2_convA'),
+                LeakyReLU(alpha=0.2),
+                Conv2D(filters=self.d_model/4, kernel_size=3, strides=1, padding='same', name='2_convB'),
+                LeakyReLU(alpha=0.2),
+                UpSampling2D((2, 2), interpolation='bilinear'), 
+                Conv2D(filters=self.d_model/8, kernel_size=3, strides=1, padding='same', name='3_convA'),
+                LeakyReLU(alpha=0.2),
+                Conv2D(filters=self.d_model/8, kernel_size=3, strides=1, padding='same', name='3_convB'),
+                LeakyReLU(alpha=0.2),
+                UpSampling2D((2, 2), interpolation='bilinear'), 
+                Conv2D(filters=self.d_model/16, kernel_size=3, strides=1, padding='same', name='4_convA'),
+                LeakyReLU(alpha=0.2),
+                Conv2D(filters=self.d_model/16, kernel_size=3, strides=1, padding='same', name='4_convB'),
+                LeakyReLU(alpha=0.2),
+                Conv2D(filters=1, kernel_size=3, strides=1, padding='same', name='conv3')
             ]
         )
 
@@ -152,5 +169,5 @@ class VisionTransformer(tf.keras.Model):
             x = layer(x, training)
 
         # First (class token) is used for classification
-        x = self.mlp_head(x[:, 0])
+        x = self.mlp_head(x[:, 0][:,None, None, :])
         return x
