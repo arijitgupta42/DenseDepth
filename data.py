@@ -17,11 +17,11 @@ def nyu_resize(img, resolution=480, padding=6):
 def get_nyu_data(batch_size, nyu_data_zipfile='nyu_data.zip'):
     data = extract_zip(nyu_data_zipfile)
 
-    nyu2_train = list((row.split(',') for row in (data['kitti_raw/kitti_train.csv']).decode("utf-8").split('\n') if len(row) > 0))
-    nyu2_test = list((row.split(',') for row in (data['kitti_raw/kitti_test.csv']).decode("utf-8").split('\n') if len(row) > 0))
+    nyu2_train = list((row.split(',') for row in (data['kitti_train.csv']).decode("utf-8").split('\n') if len(row) > 0))
+    nyu2_test = list((row.split(',') for row in (data['kitti_test.csv']).decode("utf-8").split('\n') if len(row) > 0))
 
-    shape_rgb = (batch_size, 480, 640, 3)
-    shape_depth = (batch_size, 240, 320, 1)
+    shape_rgb = (batch_size, 128, 128, 3)
+    shape_depth = (batch_size, 16, 16, 1)
 
     # Helpful for testing...
     if False:
@@ -66,12 +66,12 @@ class NYU_BasicAugmentRGBSequence(Sequence):
 
             sample = self.dataset[index]
 
-            x = np.clip(np.asarray(Image.open( BytesIO(self.data[sample[0].split('\r')[0]]))).reshape(480,640,3)/255,0,1)
-            y = np.clip(np.asarray(Image.open( BytesIO(self.data[sample[1].split('\r')[0]]) )).reshape(480,640,1)/255*self.maxDepth,0,self.maxDepth)
+            x = np.clip(np.asarray(Image.open( BytesIO(self.data[sample[0].split('\r')[0]]))).reshape(128,128,3)/255,0,1)
+            y = np.clip(np.asarray(Image.open( BytesIO(self.data[sample[1].split('\r')[0]]) )).reshape(16,16,1)/255*self.maxDepth,0,self.maxDepth)
             y = DepthNorm(y, maxDepth=self.maxDepth)
 
-            batch_x[i] = nyu_resize(x, 480)
-            batch_y[i] = nyu_resize(y, 240)
+            batch_x[i] = nyu_resize(x, 128)
+            batch_y[i] = nyu_resize(y, 16)
 
             if is_apply_policy: batch_x[i], batch_y[i] = self.policy(batch_x[i], batch_y[i])
 
@@ -101,12 +101,12 @@ class NYU_BasicRGBSequence(Sequence):
 
             sample = self.dataset[index]
 
-            x = np.clip(np.asarray(Image.open( BytesIO(self.data[sample[0].split('\r')[0]]))).reshape(480,640,3)/255,0,1)
-            y = np.asarray(Image.open(BytesIO(self.data[sample[1].split('\r')[0]])), dtype=np.float32).reshape(480,640,1).copy().astype(float) / 3.0
+            x = np.clip(np.asarray(Image.open( BytesIO(self.data[sample[0].split('\r')[0]]))).reshape(128,128,3)/255,0,1)
+            y = np.asarray(Image.open(BytesIO(self.data[sample[1].split('\r')[0]])), dtype=np.float32).reshape(16,16,1).copy().astype(float) / 3.0
             y = DepthNorm(y, maxDepth=self.maxDepth)
 
-            batch_x[i] = nyu_resize(x, 480)
-            batch_y[i] = nyu_resize(y, 240)
+            batch_x[i] = nyu_resize(x, 128)
+            batch_y[i] = nyu_resize(y, 16)
 
             # DEBUG:
             #self.policy.debug_img(batch_x[i], np.clip(DepthNorm(batch_y[i])/maxDepth,0,1), idx, i)
